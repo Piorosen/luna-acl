@@ -258,6 +258,7 @@ void Thread::wait()
     }
 }
 
+// 여기서 쓰레드의 성능 벤치하고 결과를 반환하도록 해야함.
 void Thread::worker_thread()
 {
     set_thread_affinity(_core_pin);

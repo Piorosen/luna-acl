@@ -160,6 +160,15 @@ std::vector<int> IScheduler::get_window_result() {
     return _window_size;
 }
 
+std::vector<std::string> IScheduler::get_convolution_kernel() { 
+    auto copy = vec_get_convolution_kernel;
+    vec_get_convolution_kernel.clear();
+    return copy;
+} 
+
+void IScheduler::add_convolution_kernel(std::string name) { 
+    vec_get_convolution_kernel.push_back(name);
+}
 
 void IScheduler::reset_window_result() {
     _window_size.clear();

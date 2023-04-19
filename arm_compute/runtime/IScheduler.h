@@ -64,6 +64,9 @@ public:
     std::vector<int> get_current_frequency();
     void get_set_frequency(int core_pin, int frequency);
     std::vector<int> get_available_frequency(int core_pin);
+    std::vector<std::string> get_convolution_kernel();
+    void add_convolution_kernel(std::string name);
+
     
     void set_gemm_kernelOps(std::string kernelOps);
     std::string get_gemm_kerenlOps() const;
@@ -275,6 +278,7 @@ protected:
      */
     std::size_t adjust_num_of_windows(const Window &window, std::size_t split_dimension, std::size_t init_num_windows, const ICPPKernel &kernel, const CPUInfo &cpu_info);
 
+    
 protected:
     // next layer
     std::function<bool(const char*, int)> is_next_kernel = nullptr; 
@@ -289,6 +293,7 @@ protected:
     std::function<void(std::string, unsigned int)> measure = nullptr; 
     
     // 0 : Big, 1 : Little, 2 : Mixed
+    std::vector<std::string> vec_get_convolution_kernel;
     std::vector<int> core_select = {0, 1};
     feature_info feature_data = feature_info{};
     bool on_tuner = false;
