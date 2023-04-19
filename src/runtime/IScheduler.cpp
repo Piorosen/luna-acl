@@ -110,6 +110,13 @@ std::vector<int> IScheduler::get_available_frequency(int core_pin) {
     return result;
 }
 
+std::pair<std::string, int> IScheduler::get_current_kernel() const { 
+    return std::make_pair(cur_kernel_name, cur_kernel_uuid);
+}
+void IScheduler::set_current_kernel(std::string name, int uuid) { 
+    cur_kernel_name = name;
+    cur_kernel_uuid = uuid;
+}
 
 std::vector<arm_compute::CPUModel> IScheduler::generate_core_thread() { 
     ARM_COMPUTE_ERROR("Feature for generate_core_thread setting is not implemented");

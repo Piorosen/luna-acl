@@ -67,6 +67,8 @@ public:
     std::vector<std::string> get_convolution_kernel();
     void add_convolution_kernel(std::string name);
 
+    std::pair<std::string, int> get_current_kernel() const;
+    void set_current_kernel(std::string name, int uuid);
     
     void set_gemm_kernelOps(std::string kernelOps);
     std::string get_gemm_kerenlOps() const;
@@ -280,6 +282,9 @@ protected:
 
     
 protected:
+    std::string cur_kernel_name = "";
+    int cur_kernel_uuid = 0;
+
     // next layer
     std::function<bool(const char*, int)> is_next_kernel = nullptr; 
 
