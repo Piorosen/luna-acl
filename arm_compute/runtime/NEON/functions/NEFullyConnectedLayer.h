@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2023 Arm Limited.
+ * Copyright (c) 2017-2022 Arm Limited.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -129,12 +129,12 @@ public:
                    FullyConnectedLayerInfo fc_info = FullyConnectedLayerInfo(), const WeightsInfo &weights_info = WeightsInfo());
     /** Static function to check if given info will lead to a valid configuration of @ref NEFullyConnectedLayer
      *
-     * Similar to @ref NEFullyConnectedLayer::configure()
+     * Similar to @ref NEFullyConnectedLayer
      *
      * @return a status
      */
     static Status validate(const ITensorInfo *input, const ITensorInfo *weights, const ITensorInfo *biases, const ITensorInfo *output,
-                           FullyConnectedLayerInfo fc_info = FullyConnectedLayerInfo(), const WeightsInfo &weights_info = WeightsInfo());
+                           FullyConnectedLayerInfo fc_info = FullyConnectedLayerInfo());
 
     /** Static function that queries whether fixed-format kernel exists for a given problem description
      *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Arm Limited.
+ * Copyright (c) 2018-2021 Arm Limited.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -28,6 +28,8 @@
 
 #include "arm_compute/core/Types.h"
 #include "arm_compute/runtime/MemoryGroup.h"
+#include "arm_compute/runtime/NEON/functions/NEDequantizationLayer.h"
+#include "arm_compute/runtime/NEON/functions/NEQuantizationLayer.h"
 #include "arm_compute/runtime/NEON/functions/NEReductionOperation.h"
 #include "arm_compute/runtime/NEON/functions/NEReshapeLayer.h"
 #include "arm_compute/runtime/Tensor.h"
@@ -91,8 +93,13 @@ private:
     std::vector<NEReductionOperation> _reduction_kernels;
     std::vector<Tensor>               _reduced_outs;
     NEReshapeLayer                    _reshape;
+    NEDequantizationLayer             _dequant;
+    NEQuantizationLayer               _requant;
     int                               _reduction_ops;
     bool                              _keep_dims;
+    bool                              _do_requant;
+    Tensor                            _input_no_quant;
+    Tensor                            _output_no_quant;
 };
 } // namespace arm_compute
 #endif /* ARM_COMPUTE_NEON_REDUCE_MEAN_H */

@@ -77,19 +77,17 @@ public:
     static constexpr size_t max_fused_operators = 32;
     /** Try adding (without actually adding) an operator to the group
      *
-     * @param[in] op        Operator to be added
-     * @param[in] is_output Whether this operator is the output operator.
+     * @param[in] op Operator to be added
      *
      * @return true   If @p op can be added while maintaining the invariants
      * @return false  Otherwise
      */
-    bool try_add_operator(const Operator &op, bool is_output = false) const;
+    bool try_add_operator(const Operator &op) const;
     /** Add an operator to the group
      *
-     * @param[in] op        Operator to be added
-     * @param[in] is_output Whether this operator is the output operator.
+     * @param[in] op Operator to be added
      */
-    void add_operator(const Operator &op, bool is_output = false);
+    void add_operator(const Operator &op);
     /** Create a new operator
      *
      * @param[in] operator_type @ref GpuOperatorType of the new operator

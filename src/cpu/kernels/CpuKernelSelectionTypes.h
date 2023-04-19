@@ -79,7 +79,6 @@ struct DepthwiseConv2dNativeDataTypeISASelectorData
 struct ActivationDataTypeISASelectorData
 {
     DataType                                dt;
-    const CPUModel                         &cpumodel;
     const cpuinfo::CpuIsaInfo              &isa;
     ActivationLayerInfo::ActivationFunction f;
 };

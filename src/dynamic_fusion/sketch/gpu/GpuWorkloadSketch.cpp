@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Arm Limited.
+ * Copyright (c) 2022 Arm Limited.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -43,18 +43,23 @@ const GpuWorkloadSketch::Context *GpuWorkloadSketch::gpu_context() const
     return _impl->context();
 }
 
-void GpuWorkloadSketch::register_new_tensor(ITensorInfo &tensor_info)
+TensorInfo GpuWorkloadSketch::create_tensor_info(const ITensorInfo &tensor_info)
 {
-    tensor_info.set_id(_impl->allocate_new_tensor_id());
-    // All input output tensors are User tensors that need real backing memory
-    _impl->register_memory_descriptor(tensor_info, MemoryDescriptor{ MemoryType::User });
+    TensorInfo tensor{ tensor_info };
+    tensor.set_id(allocate_new_tensor_id());
+    return tensor;
 }
 
 TensorInfo GpuWorkloadSketch::create_tensor_info()
 {
-    TensorInfo tensor_info{};
-    register_new_tensor(tensor_info);
-    return tensor_info;
+    TensorInfo tensor{};
+    tensor.set_id(allocate_new_tensor_id());
+    return tensor;
+}
+
+ITensorInfo::Id GpuWorkloadSketch::allocate_new_tensor_id()
+{
+    return _impl->allocate_new_tensor_id();
 }
 
 GpuWorkloadSketch::Implementation &GpuWorkloadSketch::implementation()

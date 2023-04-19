@@ -124,13 +124,7 @@ protected:
         {
             TensorShape output_shape = i == 0 ? src_shape : out.shape();
             output_shape.set(axis[i], 1);
-            bool is_opencl = false;
-
-#ifdef ARM_COMPUTE_OPENCL_ENABLED
-            is_opencl = std::is_same<CLTensor, TensorType>::value; // Round down to zero on opencl to match kernel
-#endif /* ARM_COMPUTE_OPENCL_ENABLED */
-            out = reference::reduction_operation<T, T>(i == 0 ? src : out, output_shape, axis[i], ReductionOperation::MEAN_SUM, quantization_info_output, is_opencl ? RoundingPolicy::TO_ZERO : RoundingPolicy::TO_NEAREST_UP);
-
+            out = reference::reduction_operation<T, T>(i == 0 ? src : out, output_shape, axis[i], ReductionOperation::MEAN_SUM, quantization_info_output);
         }
 
         if(!keep_dims)

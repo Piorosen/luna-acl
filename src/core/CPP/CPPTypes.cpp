@@ -103,12 +103,12 @@ bool CPUInfo::has_sve2() const
 
 bool CPUInfo::has_sme() const
 {
-    return _impl->info.has_sme();
+    return false;
 }
 
 bool CPUInfo::has_sme2() const
 {
-    return _impl->info.has_sme2();
+    return false;
 }
 
 CPUModel CPUInfo::get_cpu_model() const

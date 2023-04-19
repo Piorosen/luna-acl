@@ -136,7 +136,6 @@ enum class ConvolutionMethod
     GEMM,        /**< Convolution using GEMM */
     GEMM_CONV2D, /**< Direct 2D GEMM convolution */
     DIRECT,      /**< Direct convolution */
-    INDIRECT,    /**< Indirect convolution */
     WINOGRAD,    /**< Convolution using Winograd */
     FFT          /**< Convolution using FFT */
 };
@@ -151,9 +150,8 @@ enum class DepthwiseConvolutionFunction
 /** Available DeconvolutionMethod*/
 enum class DeconvolutionMethod
 {
-    GEMM,            /**< Deconvolution using GEMM */
-    DIRECT,          /**< Direct deconvolution */
-    UPSCALE_CONV2D   /**< Deconvolution with Upscaling */
+    GEMM,   /**< Deconvolution using GEMM */
+    DIRECT, /**< Direct deconvolution */
 };
 
 /** Available FuseBatchNormalizationType*/

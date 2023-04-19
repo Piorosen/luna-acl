@@ -25,7 +25,6 @@
 #define SRC_DYNAMIC_FUSION_SKETCH_GPU_COMPONENTS_CL_CLCOMPONENTDIRECTCONV2D
 
 #include "arm_compute/core/Error.h"
-#include "arm_compute/core/KernelDescriptors.h"
 #include "src/dynamic_fusion/sketch/gpu/components/IGpuKernelComponent.h"
 #include <memory>
 
@@ -57,15 +56,9 @@ public:
     /** Get fast_relaxed_math flag */
     bool fast_relaxed_math() const;
 
-    /** Set direct convolution descriptor */
-    ClComponentDirectConv2dSettings &direct_conv_descriptor(const DirectConvComputeKernelInfo &desc);
-    /** Get direct convolution descriptor */
-    DirectConvComputeKernelInfo direct_conv_descriptor() const;
-
 private:
-    bool                        _export_to_cl_image{ false };
-    bool                        _fast_relaxed_math{ true };
-    DirectConvComputeKernelInfo _desc{}; // Direct convolution descriptor
+    bool _export_to_cl_image{ false };
+    bool _fast_relaxed_math{ true };
 };
 
 /** Forward declaration */

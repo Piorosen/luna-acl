@@ -68,12 +68,6 @@ void fill(U &&tensor, int i)
             library->fill(tensor, distribution, i);
             break;
         }
-        case DataType::S32:
-        {
-            std::uniform_int_distribution<int32_t> distribution(-20000, 20000);
-            library->fill(tensor, distribution, i);
-            break;
-        }
         case DataType::F16:
         {
             arm_compute::utils::uniform_real_distribution_16bit<half> distribution{ -1.0f, 1.0f };
@@ -241,8 +235,7 @@ public:
 protected:
     TensorType compute_target(const TensorShape &shape_a, const TensorShape &shape_b, const TensorShape &shape_output, int32_t a_offset, int32_t b_offset)
     {
-        return compute_gemmlowp_target<TensorType, AccessorType, FunctionType, reinterpret_input_as_3d, reinterpret_output_as_3d, int32_t, false, run_twice>(shape_a, shape_b, shape_output, a_offset,
-                b_offset);
+        return compute_gemmlowp_target<TensorType, AccessorType, FunctionType, reinterpret_input_as_3d, reinterpret_output_as_3d, int32_t, false, run_twice>(shape_a, shape_b, shape_output, a_offset, b_offset);
     }
 
     SimpleTensor<int32_t> compute_reference(const TensorShape &shape_a, const TensorShape &shape_b, const TensorShape &shape_output, int32_t a_offset, int32_t b_offset)
@@ -254,7 +247,7 @@ protected:
     SimpleTensor<int32_t> _reference{};
 };
 
-template <typename TensorType, typename AccessorType, typename FunctionType, bool reinterpret_input_as_3d = false, bool reinterpret_output_as_3d = false, typename TI = uint8_t, typename TW = uint8_t, bool run_twice = false>
+template <typename TensorType, typename AccessorType, typename FunctionType, bool reinterpret_input_as_3d = false, bool reinterpret_output_as_3d = false, typename TI = uint8_t, typename TW = uint8_t>
 class GEMMLowpMatrixMultiplyCoreFusedOffsetOutputGenericValidationFixture : public framework::Fixture
 {
 public:
@@ -293,20 +286,18 @@ protected:
     TensorType compute_target(const TensorShape &shape_a, const TensorShape &shape_b, const TensorShape &shape_output, int32_t a_offset, int32_t b_offset, GEMMLowpOutputStageInfo output_stage,
                               DataType data_type_a, DataType data_type_b, QuantizationInfo b_qinfo, bool reshape_b_only_on_first_run = false)
     {
-        return compute_gemmlowp_target<TensorType, AccessorType, FunctionType, reinterpret_input_as_3d, reinterpret_output_as_3d, qasymm8_t, true, run_twice>(shape_a, shape_b, shape_output, a_offset,
-                b_offset,
+        return compute_gemmlowp_target<TensorType, AccessorType, FunctionType, reinterpret_input_as_3d, reinterpret_output_as_3d, qasymm8_t, true>(shape_a, shape_b, shape_output, a_offset, b_offset,
                 output_stage, data_type_a, data_type_b, b_qinfo, reshape_b_only_on_first_run);
     }
 
     SimpleTensor<TI> compute_reference(const TensorShape &shape_a, const TensorShape &shape_b, const TensorShape &shape_output, int32_t a_offset, int32_t b_offset,
                                        GEMMLowpOutputStageInfo output_stage, DataType data_type_a, DataType data_type_b, QuantizationInfo b_qinfo)
     {
-        SimpleTensor<int32_t> output = compute_gemmlowp_reference<reinterpret_input_as_3d, TI, TW, false, false, run_twice>(shape_a, shape_b, shape_output, a_offset, b_offset, data_type_a, data_type_b,
-                                                                                                                            b_qinfo);
+        SimpleTensor<int32_t> output = compute_gemmlowp_reference<reinterpret_input_as_3d, TI, TW>(shape_a, shape_b, shape_output, a_offset, b_offset, data_type_a, data_type_b, b_qinfo);
 
         TensorShape           bias_shape(shape_b[0]);
         SimpleTensor<int32_t> bias{ bias_shape, DataType::S32, 1 };
-        (run_twice) ? fill(bias, 5) : fill(bias, 2); // Fill bias with same seed as last run of gemmlowp_target
+        fill(bias, 2);
 
         switch(output_stage.type)
         {

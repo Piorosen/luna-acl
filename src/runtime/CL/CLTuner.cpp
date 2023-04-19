@@ -28,6 +28,9 @@
 #include "arm_compute/runtime/CL/CLScheduler.h"
 #include "src/core/CL/ICLKernel.h"
 #include "support/StringSupport.h"
+#if defined(ENABLE_EXPERIMENTAL_DYNAMIC_FUSION)
+#include "src/gpu/cl/kernels/experimental/dynamic_fusion/ClCompositeKernel.h"
+#endif // defined(ENABLE_EXPERIMENTAL_DYNAMIC_FUSION)
 
 #include <cerrno>
 #include <fstream>
@@ -61,6 +64,26 @@ struct DefaultKernelData : public CLTuner::IKernelData
 private:
     ITensorPack &_tensors;
 };
+
+#if defined(ENABLE_EXPERIMENTAL_DYNAMIC_FUSION)
+struct CompositeKernelData : public CLTuner::IKernelData
+{
+    CompositeKernelData(ITensorPack &tensors, const experimental::dynamic_fusion::ClExecutionDescriptor &exec_desc)
+        : _tensors{ tensors }, _exec_desc{ exec_desc }
+    {
+    }
+    ~CompositeKernelData() override = default;
+    void do_run(ICLKernel &kernel, cl::CommandQueue &queue) override
+    {
+        // ClCompositeKernel is purely stateless, and thus always requires memory injection
+        kernel.run_composite_op(_tensors, kernel.window(), queue, _exec_desc);
+    }
+
+private:
+    ITensorPack                                               &_tensors;
+    const experimental::dynamic_fusion::ClExecutionDescriptor &_exec_desc;
+};
+#endif // defined(ENABLE_EXPERIMENTAL_DYNAMIC_FUSION)
 
 bool CLTuner::kernel_event_is_set() const
 {
@@ -141,6 +164,15 @@ void CLTuner::tune_kernel_dynamic(ICLKernel &kernel, ITensorPack &tensors)
 
     do_tune_kernel_dynamic(kernel, &data);
 }
+
+#if defined(ENABLE_EXPERIMENTAL_DYNAMIC_FUSION)
+void CLTuner::tune_kernel_dynamic(ICLKernel &kernel, ITensorPack &tensors, const experimental::dynamic_fusion::ClExecutionDescriptor &exec_desc)
+{
+    CompositeKernelData data{ tensors, exec_desc };
+
+    do_tune_kernel_dynamic(kernel, &data);
+}
+#endif // defined(ENABLE_EXPERIMENTAL_DYNAMIC_FUSION)
 
 void CLTuner::add_tuning_params(const std::string &kernel_id, CLTuningParams optimal_tuning_params)
 {

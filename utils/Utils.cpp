@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, 2023 Arm Limited.
+ * Copyright (c) 2017-2019 Arm Limited.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -230,20 +230,21 @@ std::tuple<unsigned int, unsigned int, int> parse_ppm_header(std::ifstream &fs)
     return std::make_tuple(width, height, max_val);
 }
 
-npy::header_t parse_npy_header(std::ifstream &fs) //NOLINT
+std::tuple<std::vector<unsigned long>, bool, std::string> parse_npy_header(std::ifstream &fs) //NOLINT
 {
+    std::vector<unsigned long> shape; // NOLINT
+
     // Read header
-    std::string header_s = npy::read_header(fs);
+    std::string header = npy::read_header(fs);
 
     // Parse header
-    npy::header_t header = npy::parse_header(header_s);
-
-    bool fortran_order = false;
-    std::vector<unsigned long> shape = header.shape;
+    bool        fortran_order = false;
+    std::string typestr;
+    npy::parse_header(header, typestr, fortran_order, shape);
 
     std::reverse(shape.begin(), shape.end());
 
-    return npy::header_t{ header.dtype, fortran_order, shape };
+    return std::make_tuple(shape, fortran_order, typestr);
 }
 
 /** This function returns the amount of memory free reading from /proc/meminfo
