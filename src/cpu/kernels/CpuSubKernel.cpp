@@ -131,8 +131,7 @@ void CpuSubKernel::configure(const ITensorInfo *src0, const ITensorInfo *src1, I
     _name       = std::string("CpuSubKernel").append("/").append(uk->name);
 
     // CpuSubKernel doesn't need padding so update_window_and_padding() can be skipped
-    Window win;
-    std::tie(win, _split_dimension) = calculate_squashed_or_max_window(*src0, *src1);
+    Window win = calculate_max_window(out_shape, Steps());
 
     ICpuKernel::configure(win);
 }

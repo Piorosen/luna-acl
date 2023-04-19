@@ -91,16 +91,16 @@ public:
 
     static const std::vector<AddKernel> &get_available_kernels();
 
-    size_t get_split_dimension() const
+    bool get_can_interpret_inputs_as_1d_array()
     {
-        return _split_dimension;
+        return _can_interpret_inputs_as_1d_array;
     }
 
 private:
     ConvertPolicy _policy{};
     AddKernelPtr  _run_method{ nullptr };
     std::string   _name{};
-    size_t        _split_dimension{ Window::DimY };
+    bool          _can_interpret_inputs_as_1d_array{ false };
 };
 } // namespace kernels
 } // namespace cpu

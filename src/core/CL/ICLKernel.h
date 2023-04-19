@@ -44,6 +44,7 @@ namespace experimental
 {
 namespace dynamic_fusion
 {
+struct TensorBinding;
 struct ClExecutionDescriptor;
 } // namespace dynamic_fusion
 } // namespace experimental

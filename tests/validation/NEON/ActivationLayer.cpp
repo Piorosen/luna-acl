@@ -68,8 +68,6 @@ RelativeTolerance<float> relative_tolerance(DataType data_type, ActivationLayerI
         case ActivationLayerInfo::ActivationFunction::SQRT:
         case ActivationLayerInfo::ActivationFunction::TANH:
         case ActivationLayerInfo::ActivationFunction::HARD_SWISH:
-        case ActivationLayerInfo::ActivationFunction::SWISH:
-        case ActivationLayerInfo::ActivationFunction::GELU:
             switch(data_type)
             {
                 case DataType::F16:
@@ -112,7 +110,6 @@ AbsoluteTolerance<float> absolute_tolerance(DataType data_type, ActivationLayerI
         case ActivationLayerInfo::ActivationFunction::LOGISTIC:
         case ActivationLayerInfo::ActivationFunction::SQRT:
         case ActivationLayerInfo::ActivationFunction::TANH:
-        case ActivationLayerInfo::ActivationFunction::SWISH:
         case ActivationLayerInfo::ActivationFunction::HARD_SWISH:
             switch(data_type)
             {
@@ -175,8 +172,7 @@ const auto CNNDataTypes = framework::dataset::make("DataType",
     DataType::F32,
 });
 
-const auto NeonActivationFunctionsDataset = concat(datasets::ActivationFunctions(),
-    framework::dataset::make("ActivationFunction", {ActivationLayerInfo::ActivationFunction::HARD_SWISH, ActivationLayerInfo::ActivationFunction::SWISH}));
+const auto NeonActivationFunctionsDataset = concat(datasets::ActivationFunctions(), framework::dataset::make("ActivationFunction", ActivationLayerInfo::ActivationFunction::HARD_SWISH));
 
 /** Input data sets. */
 const auto ActivationDataset = combine(combine(framework::dataset::make("InPlace", { false, true }), NeonActivationFunctionsDataset), framework::dataset::make("AlphaBeta", { 0.5f, 1.f }));

@@ -106,7 +106,6 @@ struct DWCComputeKernelInfo
 {
     unsigned int n0{ 0 };                             /**< Number of columns processed by each thread */
     unsigned int m0{ 0 };                             /**< Number of rows processed by each thread */
-    bool         export_input_to_cl_image{ false };   /**< Export input to cl_image */
     bool         export_weights_to_cl_image{ false }; /**< Export the weights to cl_image */
 };
 

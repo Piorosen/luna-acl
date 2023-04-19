@@ -348,7 +348,7 @@ public:
 
     void do_teardown() override
     {
-        for(const auto &m : measurements)
+        for(auto m : measurements)
         {
             std::cout << m.first << ": " << m.second.count() << "us" << std::endl;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Arm Limited.
+ * Copyright (c) 2018-2021 Arm Limited.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -39,7 +39,6 @@
 #include "src/core/NEON/wrapper/intrinsics/div.h"
 #include "src/core/NEON/wrapper/intrinsics/dup_n.h"
 #include "src/core/NEON/wrapper/intrinsics/eor.h"
-#include "src/core/NEON/wrapper/intrinsics/erf.h"
 #include "src/core/NEON/wrapper/intrinsics/exp.h"
 #include "src/core/NEON/wrapper/intrinsics/ext.h"
 #include "src/core/NEON/wrapper/intrinsics/gethigh.h"
@@ -67,7 +66,6 @@
 #include "src/core/NEON/wrapper/intrinsics/rev64.h"
 #include "src/core/NEON/wrapper/intrinsics/round.h"
 #include "src/core/NEON/wrapper/intrinsics/setlane.h"
-#include "src/core/NEON/wrapper/intrinsics/shr.h"
 #include "src/core/NEON/wrapper/intrinsics/sin.h"
 #include "src/core/NEON/wrapper/intrinsics/sqrt.h"
 #include "src/core/NEON/wrapper/intrinsics/store.h"

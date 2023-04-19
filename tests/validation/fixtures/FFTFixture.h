@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 Arm Limited.
+ * Copyright (c) 2019-2021 Arm Limited.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -202,8 +202,6 @@ protected:
         TensorType bias    = create_tensor<TensorType>(bias_shape, _data_type, 1, QuantizationInfo(), _data_layout);
         TensorType dst     = create_tensor<TensorType>(output_shape, _data_type, 1, QuantizationInfo(), _data_layout);
 
-        add_padding_x({ &src, &weights, &bias, &dst }, _data_layout);
-
         // Create and configure function
         FunctionType conv;
         conv.configure(&src, &weights, &bias, &dst, info, act_info, _data_type == DataType::F16);
@@ -212,6 +210,8 @@ protected:
         ARM_COMPUTE_ASSERT(weights.info()->is_resizable());
         ARM_COMPUTE_ASSERT(bias.info()->is_resizable());
         ARM_COMPUTE_ASSERT(dst.info()->is_resizable());
+
+        add_padding_x({ &src, &weights, &bias, &dst }, _data_layout);
 
         // Allocate tensors
         src.allocator()->allocate();

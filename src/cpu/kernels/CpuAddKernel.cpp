@@ -39,31 +39,60 @@ namespace cpu
 {
 namespace kernels
 {
+bool can_interpret_inputs_as_1d_array(const ITensorInfo &src0, const ITensorInfo &src1)
+{
+    return !src0.has_padding() && !src1.has_padding() && src0.tensor_shape() == src1.tensor_shape();
+}
+
 namespace
 {
 static const std::vector<CpuAddKernel::AddKernel> available_kernels =
 {
     {
-        "neon_qu8_add_fixedpoint",
+        "neon_fp32_add_as_1d_array",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::QASYMM8) && data.can_use_fixedpoint;
+            return (data.dt == DataType::F32) && data.can_interpret_inputs_as_1d_array == true;
         },
-        REGISTER_FP32_NEON(arm_compute::cpu::add_q8_neon_fixedpoint<uint8_t>)
+        REGISTER_FP32_NEON(arm_compute::cpu::add_fp32_neon_as_1d_array)
     },
     {
-        "neon_qs8_add_fixedpoint",
+        "neon_fp16_add_as_1d_array",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::QASYMM8_SIGNED) && data.can_use_fixedpoint;
+            return (data.dt == DataType::F16) && data.can_interpret_inputs_as_1d_array == true;
         },
-        REGISTER_FP32_NEON(arm_compute::cpu::add_q8_neon_fixedpoint<int8_t>)
+        REGISTER_FP16_NEON(arm_compute::cpu::add_fp16_neon_as_1d_array)
+    },
+    {
+        "neon_u8_add_as_1d_array",
+        [](const CpuAddKernelDataTypeISASelectorData & data)
+        {
+            return (data.dt == DataType::U8) && data.can_interpret_inputs_as_1d_array == true;
+        },
+        REGISTER_INTEGER_NEON(arm_compute::cpu::add_u8_neon_as_1d_array)
+    },
+    {
+        "neon_s16_add_as_1d_array",
+        [](const CpuAddKernelDataTypeISASelectorData & data)
+        {
+            return (data.dt == DataType::S16) && data.can_interpret_inputs_as_1d_array == true;
+        },
+        REGISTER_INTEGER_NEON(arm_compute::cpu::add_s16_neon_as_1d_array)
+    },
+    {
+        "neon_s32_add_as_1d_array",
+        [](const CpuAddKernelDataTypeISASelectorData & data)
+        {
+            return (data.dt == DataType::S32) && data.can_interpret_inputs_as_1d_array == true;
+        },
+        REGISTER_INTEGER_NEON(arm_compute::cpu::add_s32_neon_as_1d_array)
     },
     {
         "sve2_qu8_add",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::QASYMM8) && data.isa.sve2;
+            return (data.dt == DataType::QASYMM8) && data.isa.sve2 && data.can_interpret_inputs_as_1d_array == false;
         },
         REGISTER_QASYMM8_SVE2(arm_compute::cpu::add_qasymm8_sve2)
     },
@@ -71,7 +100,7 @@ static const std::vector<CpuAddKernel::AddKernel> available_kernels =
         "sve2_qs8_add",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::QASYMM8_SIGNED) && data.isa.sve2;
+            return (data.dt == DataType::QASYMM8_SIGNED) && data.isa.sve2 && data.can_interpret_inputs_as_1d_array == false;
         },
         REGISTER_QASYMM8_SIGNED_SVE2(arm_compute::cpu::add_qasymm8_signed_sve2)
     },
@@ -79,7 +108,7 @@ static const std::vector<CpuAddKernel::AddKernel> available_kernels =
         "sve2_qs16_add",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::QSYMM16) && data.isa.sve2;
+            return (data.dt == DataType::QSYMM16) && data.isa.sve2 && data.can_interpret_inputs_as_1d_array == false;
         },
         REGISTER_QSYMM16_SVE2(arm_compute::cpu::add_qsymm16_sve2)
     },
@@ -87,7 +116,7 @@ static const std::vector<CpuAddKernel::AddKernel> available_kernels =
         "sve_fp32_add",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::F32) && data.isa.sve;
+            return (data.dt == DataType::F32) && data.isa.sve && data.can_interpret_inputs_as_1d_array == false;
         },
         REGISTER_FP32_SVE(arm_compute::cpu::add_fp32_sve)
     },
@@ -95,7 +124,7 @@ static const std::vector<CpuAddKernel::AddKernel> available_kernels =
         "sve_fp16_add",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::F16) && data.isa.sve && data.isa.fp16;
+            return (data.dt == DataType::F16) && data.isa.sve && data.isa.fp16 && data.can_interpret_inputs_as_1d_array == false;
         },
         REGISTER_FP16_SVE(arm_compute::cpu::add_fp16_sve)
     },
@@ -103,7 +132,7 @@ static const std::vector<CpuAddKernel::AddKernel> available_kernels =
         "sve_u8_add",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::U8) && data.isa.sve;
+            return (data.dt == DataType::U8) && data.isa.sve && data.can_interpret_inputs_as_1d_array == false;
         },
         REGISTER_INTEGER_SVE(arm_compute::cpu::add_u8_sve)
     },
@@ -111,7 +140,7 @@ static const std::vector<CpuAddKernel::AddKernel> available_kernels =
         "sve_s16_add",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::S16) && data.isa.sve;
+            return (data.dt == DataType::S16) && data.isa.sve && data.can_interpret_inputs_as_1d_array == false;
         },
         REGISTER_INTEGER_SVE(arm_compute::cpu::add_s16_sve)
     },
@@ -119,7 +148,7 @@ static const std::vector<CpuAddKernel::AddKernel> available_kernels =
         "sve_s32_add",
         [](const CpuAddKernelDataTypeISASelectorData & data)
         {
-            return (data.dt == DataType::S32) && data.isa.sve;
+            return (data.dt == DataType::S32) && data.isa.sve && data.can_interpret_inputs_as_1d_array == false;
         },
         REGISTER_INTEGER_SVE(arm_compute::cpu::add_s32_sve)
     },
@@ -193,12 +222,34 @@ Status validate_arguments(const ITensorInfo &src0, const ITensorInfo &src1, cons
                                         "Wrong shape for dst");
     }
 
-    const auto can_use_fixedpoint = add_q8_neon_fixedpoint_possible(&src0, &src1, &dst);
     const auto uk = CpuAddKernel::get_implementation<CpuAddKernelDataTypeISASelectorData>(CpuAddKernelDataTypeISASelectorData{ src0.data_type(),
-                                                                                          CPUInfo::get().get_isa(), can_use_fixedpoint });
+                                                                                          CPUInfo::get().get_isa(), can_interpret_inputs_as_1d_array(src0, src1) });
     ARM_COMPUTE_RETURN_ERROR_ON(uk == nullptr || uk->ukernel == nullptr);
 
     return Status{};
+}
+
+std::pair<Status, Window> validate_and_configure_window(const ITensorInfo &src0, const ITensorInfo &src1, ITensorInfo &dst)
+{
+    if(can_interpret_inputs_as_1d_array(src0, src1))
+    {
+        Window window;
+        window.set(0, Window::Dimension(0, src0.tensor_shape().total_size()));
+        return std::make_pair(Status{}, window);
+    }
+    else
+    {
+        const TensorShape &out_shape = TensorShape::broadcast_shape(src0.tensor_shape(), src1.tensor_shape());
+
+        // Auto initialize dst if not initialized
+        set_shape_if_empty(dst, out_shape);
+        set_data_type_if_unknown(dst, src0.data_type());
+
+        Window win = calculate_max_window(out_shape, Steps());
+
+        // CpuAddKernel doesn't need padding so update_window_and_padding() can be skipped
+        return std::make_pair(Status{}, win);
+    }
 }
 } // namespace
 
@@ -207,9 +258,9 @@ void CpuAddKernel::configure(const ITensorInfo *src0, const ITensorInfo *src1, I
     ARM_COMPUTE_ERROR_ON_NULLPTR(src0, src1, dst);
     ARM_COMPUTE_ERROR_THROW_ON(validate_arguments(*src0, *src1, *dst, policy));
 
-    const auto can_use_fixedpoint     = add_q8_neon_fixedpoint_possible(src0, src1, dst);
+    _can_interpret_inputs_as_1d_array = can_interpret_inputs_as_1d_array(*src0, *src1);
     const auto uk                     = CpuAddKernel::get_implementation<CpuAddKernelDataTypeISASelectorData>(CpuAddKernelDataTypeISASelectorData{ src0->data_type(),
-                                                                                                              CPUInfo::get().get_isa(), can_use_fixedpoint });
+                                                                                                              CPUInfo::get().get_isa(), _can_interpret_inputs_as_1d_array });
 
     ARM_COMPUTE_ERROR_ON_NULLPTR(uk);
 
@@ -217,16 +268,10 @@ void CpuAddKernel::configure(const ITensorInfo *src0, const ITensorInfo *src1, I
     _run_method = uk->ukernel;
     _name       = std::string("CpuAddKernel").append("/").append(uk->name);
 
-    // Auto initialize dst if not initialized
-    const TensorShape &out_shape = TensorShape::broadcast_shape(src0->tensor_shape(), src1->tensor_shape());
-    set_shape_if_empty(*dst, out_shape);
-    set_data_type_if_unknown(*dst, src0->data_type());
-
     // Configure kernel window
-    Window win;
-    std::tie(win, _split_dimension) = calculate_squashed_or_max_window(*src0, *src1);
-
-    ICpuKernel::configure(win);
+    auto win_config = validate_and_configure_window(*src0, *src1, *dst);
+    ARM_COMPUTE_ERROR_THROW_ON(win_config.first);
+    ICpuKernel::configure(win_config.second);
 }
 
 Status CpuAddKernel::validate(const ITensorInfo *src0, const ITensorInfo *src1, const ITensorInfo *dst, ConvertPolicy policy)
@@ -234,6 +279,7 @@ Status CpuAddKernel::validate(const ITensorInfo *src0, const ITensorInfo *src1, 
     ARM_COMPUTE_RETURN_ERROR_ON_NULLPTR(src0, src1, dst);
 
     ARM_COMPUTE_RETURN_ON_ERROR(validate_arguments(*src0, *src1, *dst, policy));
+    ARM_COMPUTE_RETURN_ON_ERROR(validate_and_configure_window(*src0->clone(), *src1->clone(), *dst->clone()).first);
 
     return Status{};
 }
