@@ -232,8 +232,6 @@ void CLCompileContext::set_context(cl::Context context)
 std::string CLCompileContext::generate_build_options(const StringSet &build_options_set, const std::string &kernel_path) const
 {
     std::string concat_str;
-    bool ext_supported = false;
-    std::string ext_buildopts;
 
 #if defined(ARM_COMPUTE_DEBUG_ENABLED)
     // Enable debug properties in CL kernels
@@ -249,7 +247,7 @@ std::string CLCompileContext::generate_build_options(const StringSet &build_opti
         concat_str += " -DARM_COMPUTE_OPENCL_FP16_ENABLED=1 ";
     }
 
-    if(_device.supported("cl_arm_integer_dot_product_int8") || _device.supported("cl_khr_integer_dot_product"))
+    if(_device.supported("cl_arm_integer_dot_product_int8"))
     {
         concat_str += " -DARM_COMPUTE_OPENCL_DOT8_ENABLED=1 ";
     }
@@ -259,11 +257,13 @@ std::string CLCompileContext::generate_build_options(const StringSet &build_opti
         concat_str += " -DARM_COMPUTE_OPENCL_DOT8_ACC_ENABLED=1 ";
     }
 
-    std::tie(ext_supported, ext_buildopts) = _device.is_non_uniform_workgroup_supported();
-
-    if(ext_supported)
+    if(_device.version() == CLVersion::CL20)
     {
-        concat_str += ext_buildopts;
+        concat_str += " -cl-std=CL2.0 ";
+    }
+    else if(_device.supported("cl_arm_non_uniform_work_group_size"))
+    {
+        concat_str += " -cl-arm-non-uniform-work-group-size ";
     }
     else
     {

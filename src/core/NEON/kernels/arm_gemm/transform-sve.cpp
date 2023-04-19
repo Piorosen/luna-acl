@@ -26,10 +26,7 @@
 #include "bfloat.hpp"
 #include "transform.hpp"
 
-#if !defined(_WIN64) && !defined(__OpenBSD__)
 #include <alloca.h>
-#endif /* !defined(_WIN64) && !defined(__OpenBSD__) */
-
 
 namespace arm_gemm {
 

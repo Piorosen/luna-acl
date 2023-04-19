@@ -297,7 +297,7 @@ inline bfloat16 lowest<bfloat16>()
 template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 inline bool isfinite(T value)
 {
-    return std::isfinite(static_cast<double>(value));
+    return std::isfinite(value);
 }
 
 inline bool isfinite(half_float::half value)
@@ -310,11 +310,12 @@ inline bool isfinite(bfloat16 value)
     return std::isfinite(float(value));
 }
 
+#if !defined(_WIN64)
 // std::signbit
 template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 inline bool signbit(T value)
 {
-    return std::signbit(static_cast<double>(value));
+    return std::signbit(value);
 }
 
 inline bool signbit(half_float::half value)
@@ -326,6 +327,7 @@ inline bool signbit(bfloat16 value)
 {
     return std::signbit(float(value));
 }
+#endif // !defined(_WIN64)
 } // namespace cpp11
 } // namespace support
 } // namespace arm_compute

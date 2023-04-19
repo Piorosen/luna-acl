@@ -27,9 +27,7 @@
 #include "arm_compute/core/Error.h"
 #include "depthfirst_driver.hpp"
 #include "utils.hpp"
-#if !defined(_WIN64) && !defined(__OpenBSD__)
 #include <alloca.h>
-#endif /* !defined(_WIN64) && !defined(__OpenBSD__) */
 
 namespace arm_conv {
 namespace pooling {

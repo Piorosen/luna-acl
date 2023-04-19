@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "src/cpu/kernels/assembly/arm_gemm.hpp"
+#include "arm_gemm.hpp"
 
 #include <cstddef>
 #include <limits>

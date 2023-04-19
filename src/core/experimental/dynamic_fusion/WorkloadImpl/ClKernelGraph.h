@@ -139,16 +139,16 @@ public:
     ClDirectConv2dKernelDescriptor desc{};
 };
 
-struct ClElementwiseKernel : public ClKernel
+struct ClAddKernel : public ClKernel
 {
 public:
     Complexity complexity() const override
     {
         return Complexity::Simple;
     }
-    ClElementwiseKernel()           = default;
-    ~ClElementwiseKernel() override = default;
-    ClElementwiseKernel(const ClKernelGraph *graph, Id id, const ClKernelConfig &config, const ClElementwiseKernelDescriptor &desc, const ITensorDescPack<ClKernelTensor> tensors)
+    ClAddKernel()           = default;
+    ~ClAddKernel() override = default;
+    ClAddKernel(const ClKernelGraph *graph, Id id, const ClKernelConfig &config, const ClEltwiseAddKernelDescriptor &desc, const ITensorDescPack<ClKernelTensor> tensors)
         : ClKernel{ graph, id, config, tensors }, desc{ desc }
     {
     }
@@ -156,27 +156,7 @@ public:
     bool operator==(const ClKernel &other) const override;
     Status generate(ClKernelBlueprint &bp) const override;
 
-    ClElementwiseKernelDescriptor desc{};
-};
-
-struct ClFloorKernel : public ClKernel
-{
-public:
-    Complexity complexity() const override
-    {
-        return Complexity::Simple;
-    }
-    ClFloorKernel()           = default;
-    ~ClFloorKernel() override = default;
-    ClFloorKernel(const ClKernelGraph *graph, Id id, const ClKernelConfig &config, const ClFloorKernelDescriptor &desc, const ITensorDescPack<ClKernelTensor> tensors)
-        : ClKernel{ graph, id, config, tensors }, desc{ desc }
-    {
-    }
-    static Status validate(const ITensorInfo *src, const ITensorInfo *dst);
-    bool operator==(const ClKernel &other) const override;
-    Status generate(ClKernelBlueprint &bp) const override;
-
-    ClFloorKernelDescriptor desc{};
+    ClEltwiseAddKernelDescriptor desc{};
 };
 
 struct ClKernelGraph

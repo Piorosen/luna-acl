@@ -157,19 +157,19 @@ private:
     Status translate_direct_conv2d(ClKernelGraph &kernel_graph) const;
 };
 
-class ElementwiseContent : public OperatorContent
+class AddContent : public OperatorContent
 {
 public:
-    ElementwiseContent() = default;
-    ElementwiseContent(const OperatorGraph::Implementation *graph, Id id, const ElementwiseDescriptor &desc, const ITensorDescPack<OpTensorContent> &tensors)
+    AddContent() = default;
+    AddContent(const OperatorGraph::Implementation *graph, Id id, const AddDescriptor &desc, const ITensorDescPack<OpTensorContent> &tensors)
         : OperatorContent(graph, id, tensors), desc(desc)
     {
     }
-    ~ElementwiseContent()                          = default;
-    ElementwiseContent(const ElementwiseContent &) = default;
-    ElementwiseContent &operator=(const ElementwiseContent &) = default;
-    ElementwiseContent(ElementwiseContent &&)                 = default;
-    ElementwiseContent &operator=(ElementwiseContent &&) = default;
+    ~AddContent()                  = default;
+    AddContent(const AddContent &) = default;
+    AddContent &operator=(const AddContent &) = default;
+    AddContent(AddContent &&)                 = default;
+    AddContent &operator=(AddContent &&) = default;
     bool operator==(const OperatorContent &other) const override;
     OperatorComplexity complexity() const override
     {
@@ -178,31 +178,7 @@ public:
     Status translate(ClKernelGraph &kernel_graph) const override;
 
 private:
-    ElementwiseDescriptor desc{};
-};
-
-class FloorContent : public OperatorContent
-{
-public:
-    FloorContent() = default;
-    FloorContent(const OperatorGraph::Implementation *graph, Id id, const FloorDescriptor &desc, const ITensorDescPack<OpTensorContent> &tensors)
-        : OperatorContent(graph, id, tensors), desc(desc)
-    {
-    }
-    ~FloorContent()                    = default;
-    FloorContent(const FloorContent &) = default;
-    FloorContent &operator=(const FloorContent &) = default;
-    FloorContent(FloorContent &&)                 = default;
-    FloorContent &operator=(FloorContent &&) = default;
-    bool operator==(const OperatorContent &other) const override;
-    OperatorComplexity complexity() const override
-    {
-        return OperatorComplexity::Simple;
-    }
-    Status translate(ClKernelGraph &kernel_graph) const override;
-
-private:
-    FloorDescriptor desc{};
+    AddDescriptor desc{};
 };
 
 struct OperatorGraph::Implementation
