@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (c) 2016-2021 Arm Limited.
  *
  * SPDX-License-Identifier: MIT
@@ -53,6 +53,7 @@ public:
      * @return The scheduler
      */
     static CPPScheduler &get();
+    std::vector<arm_compute::CPUModel> generate_core_thread() override;
 
     // Inherited functions overridden
     void set_num_threads(unsigned int num_threads) override;
@@ -69,6 +70,7 @@ protected:
     void run_workloads(std::vector<Workload> &workloads) override;
 
 private:
+    
     struct Impl;
     std::unique_ptr<Impl> _impl;
 };
