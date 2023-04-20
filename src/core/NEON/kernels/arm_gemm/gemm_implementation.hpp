@@ -191,7 +191,6 @@ bool find_implementation(const GemmArgs &args, const OutputStage &os, const Gemm
         }
 
         arm_compute::NEScheduler::get().add_extract_feature(i->name);
-        arm_compute::NEScheduler::get().add_convolution_kernel(i->name);
     }
 
 
