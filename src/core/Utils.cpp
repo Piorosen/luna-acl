@@ -607,7 +607,7 @@ bool has_padding_changed(const std::unordered_map<const ITensorInfo *, PaddingSi
     != padding_map.end();
 }
 
-// #ifdef ARM_COMPUTE_ASSERTS_ENABLED
+#ifdef ARM_COMPUTE_ASSERTS_ENABLED
 void print_consecutive_elements(std::ostream &s, DataType dt, const uint8_t *ptr, unsigned int n, int stream_width, const std::string &element_delim)
 {
     switch(dt)
@@ -683,6 +683,6 @@ int max_consecutive_elements_display_width(std::ostream &s, DataType dt, const u
     }
     return 0;
 }
-// #endif /* ARM_COMPUTE_ASSERTS_ENABLED */
+#endif /* ARM_COMPUTE_ASSERTS_ENABLED */
 
 } // namespace arm_compute

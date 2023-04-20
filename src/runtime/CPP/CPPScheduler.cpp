@@ -40,7 +40,6 @@
 #include <system_error>
 #include <thread>
 #include <vector>
-#include <chrono>
 
 namespace arm_compute
 {
@@ -258,7 +257,6 @@ void Thread::wait()
     }
 }
 
-// 여기서 쓰레드의 성능 벤치하고 결과를 반환하도록 해야함.
 void Thread::worker_thread()
 {
     set_thread_affinity(_core_pin);
@@ -356,7 +354,7 @@ struct CPPScheduler::Impl final
 
         // Set affinity on worked threads
         _threads.clear();
-        for(auto i = 0U; i < _num_threads; ++i)
+        for(auto i = 1U; i < _num_threads; ++i)
         {
             _threads.emplace_back(func(i, thread_hint));
         }
@@ -458,33 +456,12 @@ void CPPScheduler::set_num_threads_with_affinity(unsigned int num_threads, BindF
     _impl->set_num_threads_with_affinity(num_threads, num_threads_hint(), func);
 }
 
-std::vector<arm_compute::CPUModel> CPPScheduler::generate_core_thread() { 
-    std::vector<arm_compute::CPUModel> models;
-    int cpu_num = (int)cpu_info().get_cpu_num();
-    for (int i = 0; i < cpu_num; i++) { 
-        models.push_back(this->cpu_info().get_cpu_model(i));
-    }
-
-    set_num_threads_with_affinity(models.size(), [](int threads, int hint) -> int { 
-        ARM_COMPUTE_UNUSED(hint);
-        return threads;
-    });
-    return models;
-}
-
 unsigned int CPPScheduler::num_threads() const
 {
     return _impl->num_threads();
 }
 
 #ifndef DOXYGEN_SKIP_THIS
-/**
- * @brief 
- * 
- * 
- * @param workloads 
- * @param runMode 
- */
 void CPPScheduler::run_workloads(std::vector<IScheduler::Workload> &workloads)
 {
     // Mutex to ensure other threads won't interfere with the setup of the current thread's workloads
@@ -492,45 +469,56 @@ void CPPScheduler::run_workloads(std::vector<IScheduler::Workload> &workloads)
     // This is not great because different threads workloads won't run in parallel but at least they
     // won't interfere each other and deadlock.
     arm_compute::lock_guard<std::mutex> lock(_impl->_run_workloads_mutex);
-    const unsigned int                  num_threads_to_use = std::min((unsigned int)(this->core_select.size()), static_cast<unsigned int>(workloads.size()));
+    const unsigned int                  num_threads_to_use = std::min(_impl->num_threads(), static_cast<unsigned int>(workloads.size()));
     if(num_threads_to_use < 1)
     {
         return;
     }
     // Re-adjust the mode if the actual number of threads to use is different from the number of threads created
-    // _impl->auto_switch_mode(8);
-    // int num_threads_to_start = 0;
-    // 어차피 8 코어 이하 이니, Linear로 동작하므로 아래의 코드,
-    // Fanout, Linear 모드는 삭제함.
+    _impl->auto_switch_mode(num_threads_to_use);
+    int num_threads_to_start = 0;
+    switch(_impl->mode())
+    {
+        case CPPScheduler::Impl::Mode::Fanout:
+        {
+            num_threads_to_start = static_cast<int>(_impl->wake_fanout()) - 1;
+            break;
+        }
+        case CPPScheduler::Impl::Mode::Linear:
+        default:
+        {
+            num_threads_to_start = static_cast<int>(num_threads_to_use) - 1;
+            break;
+        }
+    }
     ThreadFeeder feeder(num_threads_to_use, workloads.size());
     ThreadInfo   info;
     info.cpu_info          = &cpu_info();
     info.num_threads       = num_threads_to_use;
-    
+    unsigned int t         = 0;
+    auto         thread_it = _impl->_threads.begin();
     // Set num_threads_to_use - 1 workloads to the threads as the remaining 1 is left to the main thread
-    for(unsigned int i = 0; i < num_threads_to_use; ++i)
+    for(; t < num_threads_to_use - 1; ++t, ++thread_it)
     {
-        auto thread_it = std::next(_impl->_threads.begin(), this->core_select[i]);
-        info.thread_id = i;
+        info.thread_id = t;
         thread_it->set_workload(&workloads, feeder, info);
     }
-    for(unsigned int i = 0; i <  num_threads_to_use; ++i)
+    thread_it = _impl->_threads.begin();
+    for(int i = 0; i < num_threads_to_start; ++i, ++thread_it)
     {
-        auto thread_it = std::next(_impl->_threads.begin(), this->core_select[i]);
         thread_it->start();
     }
-    // info.thread_id = t;                         // Set main thread's thread_id
-    // process_workloads(workloads, feeder, info); // Main thread processes workloads
+    info.thread_id = t;                         // Set main thread's thread_id
+    process_workloads(workloads, feeder, info); // Main thread processes workloads
 #ifndef ARM_COMPUTE_EXCEPTIONS_DISABLED
     try
     {
 #endif /* ARM_COMPUTE_EXCEPTIONS_DISABLED */
-        for(unsigned int i = 0; i < num_threads_to_use; ++i)
+        thread_it = _impl->_threads.begin();
+        for(unsigned int i = 0; i < num_threads_to_use - 1; ++i, ++thread_it)
         {
-            auto thread_it = std::next(_impl->_threads.begin(), this->core_select[i]);
             thread_it->wait();
         }
-
 #ifndef ARM_COMPUTE_EXCEPTIONS_DISABLED
     }
     catch(const std::system_error &e)
@@ -543,23 +531,12 @@ void CPPScheduler::run_workloads(std::vector<IScheduler::Workload> &workloads)
 
 void CPPScheduler::schedule_op(ICPPKernel *kernel, const Hints &hints, const Window &window, ITensorPack &tensors)
 {
-    if (this->on_tuner) { 
-        const unsigned int num_iterations = kernel->window().num_iterations(hints.split_dimension());
-        while (this->is_next_kernel(kernel->name(), num_iterations)) { 
-            this->core_select = this->use_core();
-            auto start = std::chrono::high_resolution_clock::now();
-            schedule_common(kernel, hints, kernel->window(), tensors);
-            auto end = std::chrono::high_resolution_clock::now();
-            this->measure(kernel->name(), (end -  start).count());
-        }
-    }else { 
-        schedule_common(kernel, hints, window, tensors);
-    }
+    schedule_common(kernel, hints, window, tensors);
 }
 
 void CPPScheduler::schedule(ICPPKernel *kernel, const Hints &hints)
 {
     ITensorPack tensors;
-    schedule_op(kernel, hints, kernel->window(), tensors);
+    schedule_common(kernel, hints, kernel->window(), tensors);
 }
 } // namespace arm_compute

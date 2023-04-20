@@ -127,26 +127,6 @@ ConvolutionMethod CpuConv2d::get_convolution_method(const ITensorInfo *input, co
     ARM_COMPUTE_ERROR_ON_NULLPTR(input, output, weights);
     ARM_COMPUTE_UNUSED(weights_info);
 
-    /**
-     * @brief 
-     * 
-     * 사용자 정의 코드
-     * 
-     */
-    if (arm_compute::NEScheduler::get().get_conv_method() == 1) { 
-        return arm_compute::ConvolutionMethod::GEMM_CONV2D;
-    }else if (arm_compute::NEScheduler::get().get_conv_method() == 2) { 
-        return arm_compute::ConvolutionMethod::GEMM;
-    }else if (arm_compute::NEScheduler::get().get_conv_method() == 3) { 
-         if(bool(CpuWinogradConv2d::validate(input, weights, nullptr, output, conv_info, act_info, enable_fast_math)))
-        {
-            return ConvolutionMethod::WINOGRAD;
-        }else { 
-            return arm_compute::ConvolutionMethod::GEMM;
-        }
-    }
-
-
     const size_t idx_w = get_data_layout_dimension_index(input->data_layout(), DataLayoutDimension::WIDTH);
     const size_t idx_h = get_data_layout_dimension_index(input->data_layout(), DataLayoutDimension::HEIGHT);
     const size_t idx_c = get_data_layout_dimension_index(input->data_layout(), DataLayoutDimension::CHANNEL);

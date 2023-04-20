@@ -72,7 +72,7 @@ void ITensor::copy_from(const ITensor &src)
     src_it, dst_it);
 }
 
-// #ifdef ARM_COMPUTE_ASSERTS_ENABLED
+#ifdef ARM_COMPUTE_ASSERTS_ENABLED
 void ITensor::print(std::ostream &s, IOFormatInfo io_fmt) const
 {
     ARM_COMPUTE_ERROR_ON(this->buffer() == nullptr);
@@ -158,7 +158,7 @@ void ITensor::print(std::ostream &s, IOFormatInfo io_fmt) const
     // Restore output stream flags
     s.copyfmt(stream_status);
 }
-// #endif /* ARM_COMPUTE_ASSERTS_ENABLED */
+#endif /* ARM_COMPUTE_ASSERTS_ENABLED */
 
 bool ITensor::is_used() const
 {

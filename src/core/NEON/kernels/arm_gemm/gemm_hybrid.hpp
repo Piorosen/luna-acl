@@ -72,7 +72,7 @@ class GemmHybrid : public GemmCommon<To, Tr> {
         if (!strategy::supports_accumulate()) {
             return args._Ksize;
         }
-        
+
         if (args._cfg && args._cfg->inner_block_size) {
             return roundup(args._cfg->inner_block_size, strategy::k_unroll());
         }
@@ -86,9 +86,10 @@ class GemmHybrid : public GemmCommon<To, Tr> {
             unsigned int block_size = iceildiv(args._Ksize, target_blocks);
 
             block_size = roundup(block_size, strategy::k_unroll());
+
             return block_size;
         }
-        
+
         return args._Ksize;
     }
 

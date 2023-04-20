@@ -23,7 +23,6 @@
  */
 
 #include "arm_gemm.hpp"
-#include "arm_compute/runtime/NEON/NEScheduler.h"
 
 #include <cstdint>
 #include <functional>
@@ -170,29 +169,6 @@ bool find_implementation(const GemmArgs &args, const OutputStage &os, const Gemm
 
     const GemmImplementation<Top, Tret, OutputStage> *saved_impl = nullptr;
     uint64_t best_estimate = 0;
-    
-    printf("%d %d %d %d\n", args._Msize, args._Nsize, args._Ksize, args._Ksections);
-
-    
-    for (const GemmImplementation<Top, Tret, OutputStage> *i = gemms; i->method != GemmMethod::DEFAULT; i++) {
-        /* Skip if this implementation doesn't support these args. */
-        if (!i->do_is_supported(args, os)) {
-            continue;
-        }
-
-        /* Skip if a specific method is requested and this is a different one. */
-        if (cfg && cfg->method != GemmMethod::DEFAULT && i->method != cfg->method) {
-            continue;
-        }
-
-        /* Skip if a filter is to be applied and it doesn't match. */
-        if (cfg && cfg->filter != "" && !strstr(i->name, cfg->filter.c_str())) {
-            continue;
-        }
-
-        arm_compute::NEScheduler::get().add_extract_feature(i->name);
-    }
-
 
     for (const GemmImplementation<Top, Tret, OutputStage> *i = gemms; i->method != GemmMethod::DEFAULT; i++) {
         /* Skip if this implementation doesn't support these args. */
@@ -216,12 +192,6 @@ bool find_implementation(const GemmArgs &args, const OutputStage &os, const Gemm
         /* Short circuit - if the estimate is zero, return this one immediately. */
         if (estimate==0) {
             impl=i;
-            return true;
-        }
-        
-        std::cout << "default kernel : " << i->name << "\n";
-        if (arm_compute::NEScheduler::get().get_gemm_kerenlOps() == i->name) { 
-            impl = i;
             return true;
         }
 

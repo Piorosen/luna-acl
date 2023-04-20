@@ -29,8 +29,6 @@
 #include "arm_compute/core/experimental/Types.h"
 
 #include <functional>
-#include <tuple>
-#include <vector>
 #include <limits>
 
 namespace arm_compute
@@ -39,66 +37,10 @@ class ICPPKernel;
 class ITensor;
 class Window;
 
-struct layer_info { 
-    std::string name;
-    int work_size;
-};
-struct feature_info { 
-    std::vector<std::string> kernel_ops{};
-    std::vector<layer_info> layer{};
-};
-
 /** Scheduler interface to run kernels */
 class IScheduler
 {
 public:
-    /** Function to be used and map a given thread id to a logical core id
-     *
-     * Mapping function expects the thread index and total number of cores as input,
-     * and returns the logical core index to bind against
-     */
-    using BindFunc = std::function<int(int, int)>;
-    virtual std::vector<arm_compute::CPUModel> generate_core_thread();
-    std::vector<int> get_max_frequency();
-    std::vector<int> get_min_frequency();
-    std::vector<int> get_current_frequency();
-    void get_set_frequency(int core_pin, int frequency);
-    std::vector<int> get_available_frequency(int core_pin);
-    
-    void set_gemm_kernelOps(std::string kernelOps);
-    std::string get_gemm_kerenlOps() const;
-
-    // Setup 하는 과정이므로 무한정으로 시간 소모하여도 성능 하락이 발생하지 않음.
-    feature_info get_extract_feature() const;
-    // Setup 하는 과정이므로 무한정으로 시간 소모하여도 성능 하락이 발생하지 않음.
-    void add_extract_feature(std::string kernel_ops);
-    void reset_extract_feature();
-    
-    std::vector<std::string> get_convolution_kernel();
-    void add_convolution_kernel(std::string name);
-
-    std::pair<std::string, int> get_current_kernel() const;
-    void set_current_kernel(std::string name, int uuid);
-
-    
-    // 0 : Default
-    // 1 : Gemm_Direct
-    // 2 : General
-    // 3 : Winograd
-    void set_conv_method(int method);
-    int get_conv_method() const;
-
-    /**
-     * @param mode 
-     */
-    void set_tuner_info(std::function<bool(const char*, int)> is_next_kernel, // next layer
-                        std::function<std::vector<int>()> use_core, // core_start, core_end()
-                        std::function<std::tuple<int, int, int>(int, int, int, int, int, int)> core_window, // window(idx, max_window)
-                        std::function<void(std::string, unsigned int)> measure); //  void(kernel_name, measure_speed)
-
-    virtual std::vector<int> get_window_result();
-    virtual void reset_window_result();
-
     /** Strategies available to split a workload */
     enum class StrategyHint
     {
@@ -106,7 +48,12 @@ public:
         DYNAMIC, /**< Split the workload dynamically using a bucket system */
     };
 
-
+    /** Function to be used and map a given thread id to a logical core id
+     *
+     * Mapping function expects the thread index and total number of cores as input,
+     * and returns the logical core index to bind against
+     */
+    using BindFunc = std::function<int(int, int)>;
 
     /** When arm_compute::ISchedular::Hints::_split_dimension is initialized with this value
      * then the schedular is free to break down the problem space over as many dimensions
@@ -281,35 +228,7 @@ protected:
      */
     std::size_t adjust_num_of_windows(const Window &window, std::size_t split_dimension, std::size_t init_num_windows, const ICPPKernel &kernel, const CPUInfo &cpu_info);
 
-protected:
-    std::string cur_kernel_name = "";
-    int cur_kernel_uuid = 0;
-    std::vector<std::string> vec_get_convolution_kernel;
-
-    // next layer
-    std::function<bool(const char*, int)> is_next_kernel = nullptr; 
-
-    // core_start, core_end()
-    std::function<std::vector<int>()> use_core = nullptr; 
-
-    // start, end, step(idx, max_idx, max_window, start, end, step)
-    std::function<std::tuple<int, int, int>(int, int, int, int, int, int)> core_window = nullptr; 
-    
-    //  void(kernel_name, measure_speed)
-    std::function<void(std::string, unsigned int)> measure = nullptr; 
-    
-    // 0 : Big, 1 : Little, 2 : Mixed
-    std::vector<int> core_select = {0, 1};
-    feature_info feature_data = feature_info{};
-    bool on_tuner = false;
-    std::string kernel_ops = "";
-
 private:
-    
-    int conv_method_select = 0;
-    
-    std::vector<int> _window_size = {};
-
     unsigned int _num_threads_hint = {};
 };
 } // namespace arm_compute
