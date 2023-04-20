@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <cstddef>
 
 #include "arm_compute/core/Coordinates.h"
@@ -280,7 +281,7 @@ public:
      *
      * @return The subwindow "id" out of "total"
      */
-    Window split_window(size_t dimension, size_t id, size_t total) const;
+    Window split_window(size_t dimension, size_t id, size_t total, int window_start, int window_end, int window_step) const;
     /** First 1D slice of the window
      *
      * @return The first slice of the window.

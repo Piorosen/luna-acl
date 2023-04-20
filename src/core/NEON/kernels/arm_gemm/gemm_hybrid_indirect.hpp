@@ -234,7 +234,6 @@ class GemmHybridIndirect : public GemmCommon<To, Tr> {
         if (!strategy::supports_accumulate() || std::is_same<OutputStage, Requantize32>::value) {
             return get_ktotal(args);
         }
-
         if (args._cfg && args._cfg->inner_block_size) {
             return roundup(args._cfg->inner_block_size, strategy::k_unroll());
         }
@@ -250,10 +249,8 @@ class GemmHybridIndirect : public GemmCommon<To, Tr> {
             unsigned int block_size = iceildiv(ktotal, target_blocks);
 
             block_size = roundup(block_size, strategy::k_unroll());
-
             return block_size;
         }
-
         return ktotal;
     }
 
