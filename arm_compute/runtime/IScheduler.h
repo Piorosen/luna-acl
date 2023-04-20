@@ -74,6 +74,12 @@ public:
     void add_extract_feature(std::string kernel_ops);
     void reset_extract_feature();
     
+    std::vector<std::string> get_convolution_kernel();
+    void add_convolution_kernel(std::string name);
+
+    std::pair<std::string, int> get_current_kernel() const;
+    void set_current_kernel(std::string name, int uuid);
+
     
     // 0 : Default
     // 1 : Gemm_Direct
@@ -276,6 +282,10 @@ protected:
     std::size_t adjust_num_of_windows(const Window &window, std::size_t split_dimension, std::size_t init_num_windows, const ICPPKernel &kernel, const CPUInfo &cpu_info);
 
 protected:
+    std::string cur_kernel_name = "";
+    int cur_kernel_uuid = 0;
+    std::vector<std::string> vec_get_convolution_kernel;
+
     // next layer
     std::function<bool(const char*, int)> is_next_kernel = nullptr; 
 
