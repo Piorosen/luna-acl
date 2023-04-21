@@ -46,14 +46,14 @@ static const GemmImplementation<__fp16, __fp16> gemm_fp16_methods[] = {
 #ifdef ARM_COMPUTE_ENABLE_SVE
 GemmImplementation<__fp16, __fp16>::with_estimate(
     GemmMethod::GEMM_HYBRID,
-    "sve_hybrid_fp16_mla_6x4VL_fp16",
+    "sve_hybrid_fp16_mla_6x4VL",
     [](const GemmArgs &args) { return args._ci->has_sve(); },
     [](const GemmArgs &args) { return GemmHybridIndirect<cls_sve_hybrid_fp16_mla_6x4VL, __fp16, __fp16>::estimate_cycles<__fp16>(args); },
     [](const GemmArgs &args) { return new GemmHybridIndirect<cls_sve_hybrid_fp16_mla_6x4VL, __fp16, __fp16>(args); }
 ),
 GemmImplementation<__fp16, __fp16>::with_estimate(
     GemmMethod::GEMM_INTERLEAVED,
-    "sve_interleaved_fp16_mla_8x3VL_fp16",
+    "sve_interleaved_fp16_mla_8x3VL",
     [](const GemmArgs &args) { return args._ci->has_sve() && (args._Ksize > 4); },
     [](const GemmArgs &args) { return GemmInterleaved<cls_sve_interleaved_fp16_mla_8x3VL, __fp16, __fp16>::estimate_cycles<__fp16>(args); },
     [](const GemmArgs &args) { return new GemmInterleaved<cls_sve_interleaved_fp16_mla_8x3VL, __fp16, __fp16>(args); }
@@ -62,21 +62,21 @@ GemmImplementation<__fp16, __fp16>::with_estimate(
 #if defined(__aarch64__)
 GemmImplementation<__fp16, __fp16>::with_estimate(
     GemmMethod::GEMM_HYBRID,
-    "a64_hybrid_fp16_mla_6x32_fp16",
+    "a64_hybrid_fp16_mla_6x32",
     [](const GemmArgs &args) { return args._ci->has_fp16(); },
     [](const GemmArgs &args) { return GemmHybridIndirect<cls_a64_hybrid_fp16_mla_6x32, __fp16, __fp16>::estimate_cycles<__fp16>(args); },
     [](const GemmArgs &args) { return new GemmHybridIndirect<cls_a64_hybrid_fp16_mla_6x32, __fp16, __fp16>(args); }
 ),
 GemmImplementation<__fp16, __fp16>::with_estimate(
     GemmMethod::GEMM_INTERLEAVED,
-    "a64_hgemm_8x24_fp16",
+    "a64_hgemm_8x24",
     [](const GemmArgs &args) { return args._ci->has_fp16(); },
     [](const GemmArgs &args) { return GemmInterleaved<cls_a64_hgemm_8x24, __fp16, __fp16>::estimate_cycles<__fp16>(args); },
     [](const GemmArgs &args) { return new GemmInterleaved<cls_a64_hgemm_8x24, __fp16, __fp16>(args); }
 ),
 {
     GemmMethod::GEMM_INTERLEAVED,
-    "a64_sgemm_8x12_fp16",
+    "a64_sgemm_8x12",
     nullptr,
     [](const GemmArgs &args) { return !args._ci->has_fp16(); },
     [](const GemmArgs &args) { return new GemmInterleaved<cls_a64_sgemm_8x12, __fp16, __fp16>(args); }
@@ -84,7 +84,7 @@ GemmImplementation<__fp16, __fp16>::with_estimate(
 #elif defined(__arm__)
 {
     GemmMethod::GEMM_INTERLEAVED,
-    "sgemm_8x6_fp16",
+    "sgemm_8x6",
     nullptr,
     nullptr,
     [](const GemmArgs &args) { return new GemmInterleaved<sgemm_8x6, __fp16, __fp16>(args); }
@@ -94,7 +94,7 @@ GemmImplementation<__fp16, __fp16>::with_estimate(
 #endif
 {
     GemmMethod::DEFAULT,
-    "default_fp16",
+    "",
     nullptr,
     nullptr,
     nullptr,
