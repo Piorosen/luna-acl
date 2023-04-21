@@ -171,7 +171,7 @@ bool find_implementation(const GemmArgs &args, const OutputStage &os, const Gemm
     const GemmImplementation<Top, Tret, OutputStage> *saved_impl = nullptr;
     uint64_t best_estimate = 0;
     
-    printf("%d %d %d %d\n", args._Msize, args._Nsize, args._Ksize, args._Ksections);
+    // printf("%d %d %d %d\n", args._Msize, args._Nsize, args._Ksize, args._Ksections);
 
     
     for (const GemmImplementation<Top, Tret, OutputStage> *i = gemms; i->method != GemmMethod::DEFAULT; i++) {
@@ -191,6 +191,7 @@ bool find_implementation(const GemmArgs &args, const OutputStage &os, const Gemm
         }
 
         arm_compute::NEScheduler::get().add_extract_feature(i->name);
+        arm_compute::NEScheduler::get().add_convolution_kernel(i->name);
     }
 
 
@@ -213,17 +214,18 @@ bool find_implementation(const GemmArgs &args, const OutputStage &os, const Gemm
         /* Test the cycle estimate */
         uint64_t estimate = i->do_cycle_estimate(args, os);
 
+        std::cout << "default kernel : " << i->name << "\n";
+        if (arm_compute::NEScheduler::get().get_gemm_kerenlOps() == i->name) { 
+            impl = i;
+            return true;
+        }
+
         /* Short circuit - if the estimate is zero, return this one immediately. */
         if (estimate==0) {
             impl=i;
             return true;
         }
         
-        std::cout << "default kernel : " << i->name << "\n";
-        if (arm_compute::NEScheduler::get().get_gemm_kerenlOps() == i->name) { 
-            impl = i;
-            return true;
-        }
 
         /* Otherwise, remember this is our best so far if we don't yet have
          * a valid candidate, or we beat the estimate.  */

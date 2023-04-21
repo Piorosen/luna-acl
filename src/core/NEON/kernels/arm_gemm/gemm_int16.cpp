@@ -35,14 +35,14 @@ namespace arm_gemm {
 static const GemmImplementation<int16_t, int32_t> gemm_s16_methods[] = {
 {
     GemmMethod::GEMM_INTERLEAVED,
-    "a64_gemm_s16_8x12",
+    "a64_gemm_s16_8x12_int16",
     nullptr,
     nullptr,
     [](const GemmArgs &args) { return new GemmInterleaved<cls_a64_gemm_s16_8x12, int16_t, int32_t>(args); }
 },
 {
     GemmMethod::DEFAULT,
-    "",
+    "default_int16",
     nullptr,
     nullptr,
     nullptr

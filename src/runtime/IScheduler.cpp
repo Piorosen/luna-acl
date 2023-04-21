@@ -181,6 +181,11 @@ void IScheduler::reset_window_result() {
     _window_size.clear();
 }
 
+void IScheduler::set_armnn_convolution_selection(std::function<std::pair<int, int>(int, int, int)> callback) { 
+    conv_method_callback = callback;
+}
+
+
 CPUInfo &IScheduler::cpu_info()
 {
     return CPUInfo::get();

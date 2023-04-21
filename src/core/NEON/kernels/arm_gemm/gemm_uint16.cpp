@@ -13,7 +13,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS_uint16", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -35,14 +35,14 @@ namespace arm_gemm {
 static const GemmImplementation<uint16_t, uint32_t> gemm_u16_methods[] = {
 {
     GemmMethod::GEMM_INTERLEAVED,
-    "a64_gemm_u16_8x12",
+    "a64_gemm_u16_8x12_uint16",
     nullptr,
     nullptr,
     [](const GemmArgs &args) { return new GemmInterleaved<cls_a64_gemm_u16_8x12, uint16_t, uint32_t>(args); }
 },
 {
     GemmMethod::DEFAULT,
-    "",
+    "default_uint16",
     nullptr,
     nullptr,
     nullptr

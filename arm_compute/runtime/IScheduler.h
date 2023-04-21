@@ -88,6 +88,12 @@ public:
     void set_conv_method(int method);
     int get_conv_method() const;
 
+    // return: conv Method, index
+    // gemmdirect, gemmgeneral, winograd counts
+    void set_armnn_convolution_selection(std::function<std::pair<int, int>(int, int, int)> callback);
+    std::function<std::pair<int, int>(int, int, int)> conv_method_callback = nullptr;
+
+
     /**
      * @param mode 
      */
@@ -282,6 +288,8 @@ protected:
     std::size_t adjust_num_of_windows(const Window &window, std::size_t split_dimension, std::size_t init_num_windows, const ICPPKernel &kernel, const CPUInfo &cpu_info);
 
 protected:
+
+
     std::string cur_kernel_name = "";
     int cur_kernel_uuid = 0;
     std::vector<std::string> vec_get_convolution_kernel;
