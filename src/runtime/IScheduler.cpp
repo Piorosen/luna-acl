@@ -231,16 +231,18 @@ void IScheduler::schedule_common(ICPPKernel *kernel, const Hints &hints, const W
 
         if(!kernel->is_parallelisable() || num_threads == 1)
         {
-            ThreadInfo info;
-            info.cpu_info = &cpu_info();
-            if(tensors.empty())
-            {
-                kernel->run(max_window, info);
-            }
-            else
-            {
-                kernel->run_op(tensors, max_window, info);
-            }
+            std::vector<IScheduler::Workload> w(1);
+            w[0] = [&max_window, &kernel, &tensors](const ThreadInfo & info) {
+                    if(tensors.empty())
+                    {
+                        kernel->run(max_window, info);
+                    }
+                    else
+                    {
+                        kernel->run_op(tensors, max_window, info);
+                    }
+                };
+            run_workloads(w);
         }
         else
         {
