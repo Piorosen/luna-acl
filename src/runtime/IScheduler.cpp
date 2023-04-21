@@ -185,6 +185,10 @@ void IScheduler::set_armnn_convolution_selection(std::function<std::pair<int, in
     conv_method_callback = callback;
 }
 
+void IScheduler::set_get_core_current_processing_time(std::function<void(std::vector<std::pair<int, long long>>)> callback) { 
+    get_core_current_processing_time = callback;
+}
+
 
 CPUInfo &IScheduler::cpu_info()
 {

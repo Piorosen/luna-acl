@@ -177,6 +177,9 @@ public:
 
     /** Function ran by the worker thread. */
     void worker_thread();
+    
+    int get_core_pin() const;
+    long long get_compute_time() const;
 
     /** Set the scheduling strategy to be linear */
     void set_linear_mode()
@@ -208,6 +211,7 @@ private:
     std::list<Thread>                 *_thread_pool{ nullptr };
     unsigned int                       _wake_beg{ 0 };
     unsigned int                       _wake_end{ 0 };
+    long long                          _current_finish_time = 0;
 };
 
 Thread::Thread(int core_pin)
@@ -258,6 +262,14 @@ void Thread::wait()
     }
 }
 
+int Thread::get_core_pin() const { 
+    return this->_core_pin;
+}
+long long Thread::get_compute_time() const { 
+    return this->_current_finish_time;
+}
+
+
 // 여기서 쓰레드의 성능 벤치하고 결과를 반환하도록 해야함.
 void Thread::worker_thread()
 {
@@ -293,8 +305,9 @@ void Thread::worker_thread()
         try
         {
 #endif /* ARM_COMPUTE_EXCEPTIONS_ENABLED */
+            auto start = std::chrono::high_resolution_clock::now();
             process_workloads(*_workloads, *_feeder, _info);
-
+            _current_finish_time = (long long)(std::chrono::high_resolution_clock::now() - start).count();
 #ifndef ARM_COMPUTE_EXCEPTIONS_DISABLED
         }
         catch(...)
@@ -309,6 +322,7 @@ void Thread::worker_thread()
     }
 }
 } //namespace
+
 
 struct CPPScheduler::Impl final
 {
@@ -538,6 +552,16 @@ void CPPScheduler::run_workloads(std::vector<IScheduler::Workload> &workloads)
         std::cerr << "Caught system_error with code " << e.code() << " meaning " << e.what() << '\n';
     }
 #endif /* ARM_COMPUTE_EXCEPTIONS_DISABLED */
+
+    if (get_core_current_processing_time != nullptr) { 
+        std::vector<std::pair<int, long long>> result;
+        for(unsigned int i = 0; i < num_threads_to_use; ++i)
+        {
+            auto thread_it = std::next(_impl->_threads.begin(), this->core_select[i]);
+            result.push_back(std::make_pair(thread_it->get_core_pin(), thread_it->get_compute_time()));
+        }
+        get_core_current_processing_time(result);
+    }
 }
 #endif /* DOXYGEN_SKIP_THIS */
 

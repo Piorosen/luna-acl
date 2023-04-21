@@ -80,6 +80,9 @@ public:
     std::pair<std::string, int> get_current_kernel() const;
     void set_current_kernel(std::string name, int uuid);
 
+
+
+
     
     // 0 : Default
     // 1 : Gemm_Direct
@@ -92,6 +95,9 @@ public:
     // gemmdirect, gemmgeneral, winograd counts
     void set_armnn_convolution_selection(std::function<std::pair<int, int>(int, int, int)> callback);
     std::function<std::pair<int, int>(int, int, int)> conv_method_callback = nullptr;
+
+    void set_get_core_current_processing_time(std::function<void(std::vector<std::pair<int, long long>>)> callback);
+
 
 
     /**
@@ -288,6 +294,7 @@ protected:
     std::size_t adjust_num_of_windows(const Window &window, std::size_t split_dimension, std::size_t init_num_windows, const ICPPKernel &kernel, const CPUInfo &cpu_info);
 
 protected:
+    std::function<void(std::vector<std::pair<int, long long>>)> get_core_current_processing_time = nullptr;
 
 
     std::string cur_kernel_name = "";
