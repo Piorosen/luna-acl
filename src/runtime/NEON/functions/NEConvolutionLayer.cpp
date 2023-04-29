@@ -79,6 +79,7 @@ void NEConvolutionLayer::configure(ITensor *input, const ITensor *weights, const
         {
             auto f = std::make_unique<cpu::CpuConv2d>();
             f->configure(input->info(), weights->info(), ((biases != nullptr) ? biases->info() : nullptr), output->info(), conv_info, weights_info, dilation, act_info, enable_fast_math, num_groups);
+            
             _impl->op = std::move(f);
             break;
         }

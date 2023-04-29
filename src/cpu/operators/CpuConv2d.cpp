@@ -60,12 +60,14 @@ void CpuConv2d::configure(ITensorInfo *input, ITensorInfo *weights, const ITenso
         {
             auto f = std::make_unique<CpuWinogradConv2d>();
             f->configure(input, weights, biases, output, conv_info, act_info, enable_fast_math);
+            
             _function = std::move(f);
             break;
         }
         case ConvolutionMethod::GEMM:
         {
             auto f = std::make_unique<CpuGemmConv2d>();
+            
             f->configure(input, weights, biases, output, conv_info, weights_info, dilation, act_info, enable_fast_math);
             _function = std::move(f);
             break;
