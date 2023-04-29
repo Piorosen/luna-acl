@@ -93,8 +93,8 @@ public:
 
     // return: conv Method, index
     // gemmdirect, gemmgeneral, winograd counts
-    void set_armnn_convolution_selection(std::function<std::pair<int, int>(int, int, int)> callback);
-    std::function<std::pair<int, int>(int, int, int)> conv_method_callback = nullptr;
+    void set_armnn_convolution_selection(std::function<std::pair<int, int>(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&)> callback);
+    std::function<std::pair<int, int>(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&)> conv_method_callback = nullptr;
 
     void set_get_core_current_processing_time(std::function<void(std::vector<std::pair<int, long long>>)> callback);
 

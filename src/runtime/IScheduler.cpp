@@ -181,7 +181,7 @@ void IScheduler::reset_window_result() {
     _window_size.clear();
 }
 
-void IScheduler::set_armnn_convolution_selection(std::function<std::pair<int, int>(int, int, int)> callback) { 
+void IScheduler::set_armnn_convolution_selection(std::function<std::pair<int, int>(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&)> callback) { 
     conv_method_callback = callback;
 }
 
